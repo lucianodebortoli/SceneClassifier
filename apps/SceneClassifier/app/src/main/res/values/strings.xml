@@ -53,54 +53,6 @@
         <item>subway</item>
     </string-array>
 
-    <string-array name="p_EN">
-        <item>airport</item>
-        <item>beach</item>
-        <item>bus</item>
-        <item>coffee shop</item>
-        <item>car</item>
-        <item>city center</item>
-        <item>forest path</item>
-        <item>grocery store</item>
-        <item>home</item>
-        <item>library</item>
-        <item>metro</item>
-        <item>subway</item>
-        <item>office</item>
-        <item>park</item>
-        <item>public square</item>
-        <item>residential</item>
-        <item>mall</item>
-        <item>pedestrian</item>
-        <item>traffic</item>
-        <item>train</item>
-        <item>tram</item>
-    </string-array>
-
-    <string-array name="p_ES">
-        <item>aeropuerto</item>
-        <item>playa</item>
-        <item>bus</item>
-        <item>cafe - resto</item>
-        <item>auto</item>
-        <item>ciudad</item>
-        <item>bosque</item>
-        <item>tienda</item>
-        <item>casa</item>
-        <item>biblioteca</item>
-        <item>subte</item>
-        <item>est. subte</item>
-        <item>oficina</item>
-        <item>parque</item>
-        <item>plaza</item>
-        <item>residential</item>
-        <item>c. comercial</item>
-        <item>peatonal</item>
-        <item>tránsito</item>
-        <item>tren</item>
-        <item>tranvía</item>
-    </string-array>
-
     <string name="textRun">"RUN"</string>
     <string name="textREC">"REC"</string>
     <string name="textProcess">"PROCESS"</string>

@@ -22,24 +22,18 @@ public class InformationActivity extends AppCompatActivity {
         diversityTextView =    findViewById(R.id.diversityTextView);
         datasetListView =       findViewById(R.id.datasetListView);
         Intent incomingIntent = getIntent();
-        String currentDataset = incomingIntent.getStringExtra("dataset");
         String currentLanguage = incomingIntent.getStringExtra("language");
         String numClasses = incomingIntent.getStringExtra("classes");
-        String title = currentDataset+" - "+getResources().getString(R.string.textLabels);
+        String title =getResources().getString(R.string.textLabels);
         datasetTitleTextView.setText(title);
         diversityTextView.setText(numClasses);
-        if (currentDataset.equals("GLOBAL") && currentLanguage.equals("ENGLISH")) {
+        if (currentLanguage.equals("ENGLISH")) {
             List<String> labels = Arrays.asList(getResources().getStringArray(R.array.g_EN));
             updateLists(labels);
-        } else if (currentDataset.equals("GLOBAL") && currentLanguage.equals("ESPAÑOL")) {
+        } else if (currentLanguage.equals("ESPAÑOL")) {
             List<String> labels = Arrays.asList(getResources().getStringArray(R.array.g_ES));
             updateLists(labels);
-        } else if (currentDataset.equals("PARTICULAR") && currentLanguage.equals("ENGLISH")) {
-            List<String> labels = Arrays.asList(getResources().getStringArray(R.array.p_EN));
-            updateLists(labels);
-        } else if (currentDataset.equals("PARTICULAR") && currentLanguage.equals("ESPAÑOL")) {
-            List<String> labels = Arrays.asList(getResources().getStringArray(R.array.p_ES));
-            updateLists(labels);}
+        }
     } // onCreate end
 
     private void updateLists(List<String> labels){

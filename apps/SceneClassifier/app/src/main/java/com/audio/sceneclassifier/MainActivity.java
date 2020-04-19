@@ -55,6 +55,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import org.tensorflow.lite.Interpreter;
+import static java.util.Locale.*;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -63,14 +64,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     TextView predictionView_0, predictionView_1, predictionView_2, languageTextView,
              bufferTextView, bufferEditTextView, dynamicRangeTextViewEdit, dynamicRangeTextView,
-            xLabelTextView, dataSetTextView, colorMapTextView, integrationTextView;
+            xLabelTextView, colorMapTextView, integrationTextView;
     Button logButton, validateButton, runButton, infoButton;
     ProgressBar predictionBar1, predictionBar2, predictionBar3, loadingBar, horizontalProgressBar;
     ImageView spectrogramImageView, colorBarImageView;
-    Spinner dataSetSpinner, colorMapSpinner, integrationSpinner, languageSpinner;
+    Spinner colorMapSpinner, integrationSpinner, languageSpinner;
     Switch loopSwitch, compressorSwitch;
 
-    // INITIALIZE GLOBAL VARIABLES:
+    // INITIALIZE VARIABLES:
     public int sampleRate=      48000;
     public int hopLength =      1024;
     public int fftSize =        2048;
@@ -91,11 +92,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public boolean loopRunning = true;
     public boolean compressorOn = false;
     public String[] labels;
-    public String modelFileName, dynamicRange, label_0="...", label_1="...", label_2="...";
+    public String dynamicRange, label_0="...", label_1="...", label_2="...";
+    public String modelFileName = "CNN.tflite";
     public String currentLanguage = "ENGLISH";
     public String currentColorMap = "MAGMA";
-    public String currentDataSet = "PARTICULAR";
-    public List<String> particularLabelsList, globalLabelsList;
+    public List<String> labelsList;
     public String directory = Environment.getExternalStorageDirectory()+"/SceneClassifier";
 
     //----------------------------------- METHODS -------------------------------------------------
@@ -140,10 +141,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         predictionBar3=             findViewById(R.id.progressBar3);
         loadingBar =                findViewById(R.id.loadingBar);
         horizontalProgressBar =     findViewById(R.id.horizontalProgressBar);
-        dataSetTextView =           findViewById(R.id.datasetTextView);
         colorMapTextView =          findViewById(R.id.colorMapTextView);
         integrationTextView =       findViewById(R.id.integrationTextView);
-        dataSetSpinner =            findViewById(R.id.datasetSpinner);
         colorMapSpinner =           findViewById(R.id.colorMapSpinner);
         integrationSpinner =        findViewById(R.id.integrationSpinner);
         runButton =                 findViewById(R.id.runButton);
@@ -158,12 +157,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         languageSpinner.setAdapter(languageAdapter);
         languageSpinner.setOnItemSelectedListener(this);
-        // DATA BASE SPINNER:
-        ArrayAdapter<CharSequence> dataSetAdapter = ArrayAdapter.createFromResource(
-                this,R.array.dataset,android.R.layout.simple_spinner_item);
-        dataSetAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        dataSetSpinner.setAdapter(dataSetAdapter);
-        dataSetSpinner.setOnItemSelectedListener(this);
         // INTEGRATION SPINNER:
         ArrayAdapter<CharSequence> integrationAdapter = ArrayAdapter.createFromResource(
                 this,R.array.integration,android.R.layout.simple_spinner_item);
@@ -206,11 +199,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // SPINNER SELECT LANGUAGE;
         if (itemSelected.equals("ENGLISH")) {currentLanguage = "ENGLISH";}
         if (itemSelected.equals("ESPAÑOL")) {currentLanguage = "ESPAÑOL";}
-        // SPINNER SELECT MODEL;
-        if (itemSelected.equals("PARTICULAR")) {
-            currentDataSet = "PARTICULAR";}
-        if (itemSelected.equals("GLOBAL")) {
-            currentDataSet = "GLOBAL";}
         // SPINNER SELECT INTEGRATION;
         if (itemSelected.equals("INT 5")) {nInteg = 5;}
         if (itemSelected.equals("INT 4")) {nInteg = 4;}
@@ -221,11 +209,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (itemSelected.equals("MAGMA")) {currentColorMap = "MAGMA"; }
         if (itemSelected.equals("PLASMA")) {currentColorMap = "PLASMA"; }
         if (itemSelected.equals("VIRIDIS")) {currentColorMap = "VIRIDIS"; }
-        setLanguage();
-        updateLabels();
+        updateStrings();
         initializePredictions();
         updatePredictions();
-        updateStrings();
         showSpectrogram();
         Toast.makeText(this, "Settings Updated", Toast.LENGTH_SHORT).show();
         Log.d("console", "UI: Spinners selected: "+itemSelected);
@@ -236,51 +222,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Log.d("console", "Nothing Selected");
     } // onNothingSelected end
 
-    private void setLanguage(){
+    private void updateStrings(){
         if (currentLanguage.equals("ENGLISH")) {
             setAppLocale("en");
-            particularLabelsList = Arrays.asList(getResources().getStringArray(R.array.p_EN));
-            globalLabelsList = Arrays.asList(getResources().getStringArray(R.array.g_EN));}
+            labelsList = Arrays.asList(getResources().getStringArray(R.array.g_EN));}
         if (currentLanguage.equals("ESPAÑOL")) {
             setAppLocale("es");
-            particularLabelsList = Arrays.asList(getResources().getStringArray(R.array.p_ES));
-            globalLabelsList = Arrays.asList(getResources().getStringArray(R.array.g_ES));}
-    } // setLanguage end
-
-    private void updateLabels(){
-        if (currentDataSet.equals("PARTICULAR")) {
-            modelFileName = "PARTICULAR.tflite";
-            numClasses = particularLabelsList.size();
-            labels = new String[numClasses];
-            for (int i = 0; i < numClasses; i++) {labels[i] = particularLabelsList.get(i);
-                Log.d("Labels", "LABEL: "+i+" "+labels[i]);
-            }
-        } else if (currentDataSet.equals("GLOBAL")){
-            modelFileName = "GLOBAL.tflite";
-            numClasses = globalLabelsList.size();
-            labels = new String[numClasses];
-            for (int i = 0; i < numClasses; i++) {labels[i] = globalLabelsList.get(i);
-                Log.d("Labels", "LABEL: "+i+" "+labels[i]);
-            }
-        }
-    } // updateLabels end
-
-    private void updateStrings(){
+            labelsList = Arrays.asList(getResources().getStringArray(R.array.g_ES));}
+        numClasses = labelsList.size();
+        labels = new String[numClasses];
+        for (int i = 0; i < numClasses; i++) {
+            labels[i] = labelsList.get(i);
+            Log.d("Labels", "LABEL: " + i + " " + labels[i]); }
         bufferTextView.setText(R.string.textBuffer);
         xLabelTextView.setText(R.string.textXLabel);
-        dataSetTextView.setText(R.string.textDataSet);
         integrationTextView.setText(R.string.textIntegration);
         runButton.setText(R.string.textRun);
         languageTextView.setText(R.string.textLanguage);
         colorMapTextView.setText(R.string.textColorMap);
         dynamicRangeTextView.setText(getResources().getString(R.string.textDynamicRange));
-    }
+    } // setLanguage end
 
     private void resetUI() {
         logButton.setEnabled(false);
         validateButton.setEnabled(false);
         infoButton.setEnabled(false);
-        dataSetSpinner.setEnabled(false);
         compressorSwitch.setEnabled(false);
         validateButton.setVisibility(View.INVISIBLE);
         logButton.setVisibility(View.INVISIBLE);
@@ -301,8 +267,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         dynamicRangeTextView.setVisibility(View.INVISIBLE);
         loopSwitch.setVisibility(View.INVISIBLE);
         compressorSwitch.setVisibility(View.INVISIBLE);
-        dataSetSpinner.setVisibility(View.INVISIBLE);
-        dataSetTextView.setVisibility(View.INVISIBLE);
     }
 
     private void showUI(){
@@ -338,11 +302,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     } // showUI end
 
     private void showDeveloperUI(){
-        //dataSetSpinner.setEnabled(true);
         validateButton.setEnabled(true);
-        //compressorSwitch.setEnabled(true);
-        //compressorSwitch.setVisibility(View.VISIBLE);
-        //dataSetSpinner.setVisibility(View.VISIBLE);
+        compressorSwitch.setEnabled(true);
+        compressorSwitch.setVisibility(View.VISIBLE);
         validateButton.setVisibility(View.VISIBLE);
     } // showDeveloperUI end
 
@@ -378,7 +340,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void showInfo(){
         Intent intent = new Intent(MainActivity.this,InformationActivity.class);
-        intent.putExtra("dataset", currentDataSet);
         intent.putExtra("language",currentLanguage);
         intent.putExtra("classes", numClasses+"°");
         startActivity(intent);
@@ -399,10 +360,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 spectrogramToPlot[y][x] = spectrogram[x][y];
                 if (spectrogram[x][y]>specMax){specMax = spectrogram[x][y];}
                 if (spectrogram[x][y]<specMin){specMin = spectrogram[x][y];}}}
-        dynamicRange = (80.0f-(Math.round(specMin*80.0*10.0)/10.0))+" dB";
+          dynamicRange = (Math.round((specMax-specMin)*80.0*10.0)/10.0)+" dB";
         // apply color map.
         SpectrogramView spectrogramView = new SpectrogramView(
-                getApplicationContext(),spectrogramToPlot,currentColorMap,5,10);
+                getApplicationContext(),spectrogramToPlot,currentColorMap,3,10);
         spectrogramImageView.setImageBitmap(spectrogramView.getBitmap());
         if (currentColorMap.equals("MAGMA")){
             colorBarImageView.setImageResource(R.drawable.magma_cmap);}
@@ -490,7 +451,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     } // logPredictions end
 
     private String getCurrentTime(){
-        return new SimpleDateFormat("HHmmss").format(Calendar.getInstance().getTime());
+        return new SimpleDateFormat("HHmmss", getDefault())
+                .format(Calendar.getInstance().getTime());
     } // getCurrentTime end
 
     private void requestAudioPermission(){
@@ -735,7 +697,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         private float[] compressor(float[] signal) {
             float threshold = 1-((peak(signal)-rms(signal))); // variable threshold.
-            float gainReduction = 1/2;
+            float gainReduction = 0.5f;
             float gainMakeUp = 1.0f;
             float[] output = new float[signal.length];
             System.arraycopy(signal, 0, output, 0, signal.length);
@@ -839,6 +801,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             showUI();
             showDeveloperUI();
             if (loopRunning) {executeTasks();}}
-    } // ProcessTask end
+    } // InferenceTask end
 } // MainActivity class end;
 
