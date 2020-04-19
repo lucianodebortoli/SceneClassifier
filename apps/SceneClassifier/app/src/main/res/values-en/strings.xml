@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SceneClassifier</string>
+    <string name="textBuffer">Buffer Size:</string>
+    <string name="textColorMap">ColorMap:</string>
+    <string name="textDataSet">Dataset:</string>
+    <string name="textInference">PREDICT</string>
+    <string name="textIntegration">Integration:</string>
+    <string name="textLanguage">Language:</string>
+    <string name="textProcess">PROCESS</string>
+    <string name="textREC">REC</string>
+    <string name="textRun">RUN</string>
+    <string name="textTitle">Spectrogram</string>
+    <string name="textXLabel">Mel Frequencies / Time Frames</string>
+    <string name="textLoop">LOOP</string>
+    <string name="textSettingsUpdated">Settings Updated</string>
+    <string name="textSamples">samples</string>
+    <string name="textSaved">saved</string>
+    <string name="textNot_saved">not saved</string>
+    <string name="textDynamicRange">Dynamic Range:</string>
+    <string name="textDiversity">Diversity:</string>
+    <string name="textClasses">classes</string>
+    <string name="textLabels">LABELS</string>
+</resources>

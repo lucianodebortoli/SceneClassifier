@@ -1,0 +1,11 @@
+00_quiet_interior
+01_cafe_resto
+02_mall
+03_urban_park
+04_street_urban
+05_street_traffic
+06_bus
+07_car
+08_train
+09_metro
+10_metro_station

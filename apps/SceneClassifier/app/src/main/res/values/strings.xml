@@ -1,0 +1,124 @@
+<resources>
+    <string name="app_name">SceneClassifier</string>
+
+    <string-array name="language">
+        <item>ENGLISH</item>
+        <item>ESPAÑOL</item>
+    </string-array>
+
+    <string-array name="dataset">
+        <item>GLOBAL</item>
+        <item>PARTICULAR</item>
+    </string-array>
+
+    <string-array name="integration">
+        <item>INT 5</item>
+        <item>INT 4</item>
+        <item>INT 3</item>
+        <item>INT 2</item>
+        <item>INT 1</item>
+    </string-array>
+
+    <string-array name="colorMap">
+        <item>MAGMA</item>
+        <item>PLASMA</item>
+        <item>VIRIDIS</item>
+    </string-array>
+
+    <string-array name="g_ES">
+        <item>calmo interior</item>
+        <item>cafe - resto</item>
+        <item>c. comercial</item>
+        <item>parque urbano</item>
+        <item>calle urbana</item>
+        <item>calle transito</item>
+        <item>autobús</item>
+        <item>automóvil</item>
+        <item>tren</item>
+        <item>subte</item>
+        <item>est. subte</item>
+    </string-array>
+
+    <string-array name="g_EN">
+        <item>quiet interior</item>
+        <item>coffee shop</item>
+        <item>mall</item>
+        <item>urban park</item>
+        <item>street urban</item>
+        <item>traffic</item>
+        <item>bus</item>
+        <item>car</item>
+        <item>train</item>
+        <item>metro</item>
+        <item>subway</item>
+    </string-array>
+
+    <string-array name="p_EN">
+        <item>airport</item>
+        <item>beach</item>
+        <item>bus</item>
+        <item>coffee shop</item>
+        <item>car</item>
+        <item>city center</item>
+        <item>forest path</item>
+        <item>grocery store</item>
+        <item>home</item>
+        <item>library</item>
+        <item>metro</item>
+        <item>subway</item>
+        <item>office</item>
+        <item>park</item>
+        <item>public square</item>
+        <item>residential</item>
+        <item>mall</item>
+        <item>pedestrian</item>
+        <item>traffic</item>
+        <item>train</item>
+        <item>tram</item>
+    </string-array>
+
+    <string-array name="p_ES">
+        <item>aeropuerto</item>
+        <item>playa</item>
+        <item>bus</item>
+        <item>cafe - resto</item>
+        <item>auto</item>
+        <item>ciudad</item>
+        <item>bosque</item>
+        <item>tienda</item>
+        <item>casa</item>
+        <item>biblioteca</item>
+        <item>subte</item>
+        <item>est. subte</item>
+        <item>oficina</item>
+        <item>parque</item>
+        <item>plaza</item>
+        <item>residential</item>
+        <item>c. comercial</item>
+        <item>peatonal</item>
+        <item>tránsito</item>
+        <item>tren</item>
+        <item>tranvía</item>
+    </string-array>
+
+    <string name="textRun">"RUN"</string>
+    <string name="textREC">"REC"</string>
+    <string name="textProcess">"PROCESS"</string>
+    <string name="textInference">PREDICT</string>
+    <string name="textBuffer">"Buffer Size:</string>
+    <string name="textDataSet">Dataset:</string>
+    <string name="textIntegration">"Integration:</string>
+    <string name="textColorMap">"ColorMap:</string>
+    <string name="textXLabel">Mel Frequencies / Time Frames</string>
+    <string name="textTitle">Spectrogram</string>
+    <string name="textLanguage">Language:</string>
+    <string name="textLoop">LOOP</string>
+    <string name="textSettingsUpdated">Settings Updated</string>
+    <string name="textSamples">samples</string>
+    <string name="textSaved">saved</string>
+    <string name="textNot_saved">not saved</string>
+    <string name="textDynamicRange">Dynamic Range:</string>
+    <string name="textClasses">classes</string>
+    <string name="textLabels">LABELS</string>
+
+</resources>

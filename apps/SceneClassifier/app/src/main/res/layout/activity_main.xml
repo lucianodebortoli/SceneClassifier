@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/infoButton"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/roundedbutton"
+        android:text="INFO"
+        app:layout_constraintBottom_toTopOf="@+id/logButton"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Spinner
+        android:id="@+id/languageSpinner"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/integrationSpinner"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/languageTextView" />
+
+    <TextView
+        android:id="@+id/languageTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="start"
+        android:text="Language:"
+        app:layout_constraintEnd_toEndOf="@+id/languageSpinner"
+        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintStart_toStartOf="@+id/languageSpinner"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalProgressBar" />
+
+    <TextView
+        android:id="@+id/integrationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="start"
+        android:indeterminate="true"
+        android:text="Integration:"
+        app:layout_constraintEnd_toEndOf="@+id/integrationSpinner"
+        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintStart_toStartOf="@+id/integrationSpinner"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalProgressBar" />
+
+    <ProgressBar
+        android:id="@+id/progressBar3"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="80dp"
+        android:layout_height="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/prediction3TextView"
+        app:layout_constraintStart_toStartOf="@+id/progressBar2"
+        app:layout_constraintTop_toTopOf="@+id/prediction3TextView" />
+
+    <ProgressBar
+        android:id="@+id/progressBar2"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="80dp"
+        android:layout_height="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/prediction2TextView"
+        app:layout_constraintStart_toStartOf="@+id/progressBar1"
+        app:layout_constraintTop_toTopOf="@+id/prediction2TextView" />
+
+    <TextView
+        android:id="@+id/bufferEditTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="samples"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/bufferTextView"
+        app:layout_constraintStart_toStartOf="@+id/guideline" />
+
+
+    <TextView
+        android:id="@+id/prediction1TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="SCENE1 (ACC%)"
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/progressBar1"
+        app:layout_constraintTop_toBottomOf="@+id/integrationSpinner" />
+
+    <ImageView
+        android:id="@+id/spectrogramImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.45"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/xLabelTextView"
+        app:srcCompat="@drawable/blank256" />
+
+    <TextView
+        android:id="@+id/xLabelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Mel Frequencies / Time Frames"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/prediction3TextView" />
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="80dp"
+        android:layout_height="12dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/prediction1TextView"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="@+id/prediction1TextView" />
+
+    <TextView
+        android:id="@+id/bufferTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:text="Buffer Size:"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/maxTextView" />
+
+    <TextView
+        android:id="@+id/prediction2TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:text="SCENE2 (ACC%)"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/progressBar2"
+        app:layout_constraintTop_toBottomOf="@+id/prediction1TextView" />
+
+    <TextView
+        android:id="@+id/prediction3TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:text="SCENE3 (ACC%)"
+        app:layout_constraintEnd_toStartOf="@+id/progressBar3"
+        app:layout_constraintTop_toBottomOf="@+id/prediction2TextView" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <ProgressBar
+        android:id="@+id/loadingBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toBottomOf="@+id/spectrogramImageView"
+        app:layout_constraintEnd_toEndOf="@+id/spectrogramImageView"
+        app:layout_constraintStart_toStartOf="@+id/spectrogramImageView"
+        app:layout_constraintTop_toTopOf="@+id/spectrogramImageView" />
+
+    <Spinner
+        android:id="@+id/datasetSpinner"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/runButton" />
+
+
+    <Spinner
+        android:id="@+id/colorMapSpinner"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/integrationSpinner"
+        app:layout_constraintTop_toBottomOf="@+id/colorMapTextView" />
+
+    <Spinner
+        android:id="@+id/integrationSpinner"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/integrationTextView" />
+
+    <TextView
+        android:id="@+id/datasetTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:gravity="end"
+        android:text="Dataset:"
+        app:layout_constraintBottom_toTopOf="@+id/datasetSpinner"
+        app:layout_constraintStart_toStartOf="@+id/datasetSpinner" />
+
+    <TextView
+        android:id="@+id/colorMapTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="end"
+        android:text="ColorMap:"
+        app:layout_constraintEnd_toEndOf="@+id/colorMapSpinner"
+        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintStart_toStartOf="@+id/colorMapSpinner"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalProgressBar" />
+
+    <Button
+        android:id="@+id/validateButton"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/roundedbutton"
+        android:text="VAL"
+        app:layout_constraintBottom_toTopOf="@+id/compressorSwitch"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/logButton"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/roundedbutton"
+        android:text="LOG"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/colorbarImageView"
+        android:layout_width="59dp"
+        android:layout_height="250dp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/spectrogramImageView"
+        app:layout_constraintStart_toEndOf="@+id/spectrogramImageView"
+        app:layout_constraintTop_toTopOf="@+id/spectrogramImageView"
+        app:srcCompat="@drawable/magma_cmap" />
+
+    <Button
+        android:id="@+id/runButton"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/roundedbutton"
+        android:text="RUN"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/horizontalProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Switch
+        android:id="@+id/loopSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:checked="true"
+        android:text="@string/textLoop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Switch
+        android:id="@+id/compressorSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:checked="false"
+        android:text="COMP"
+        app:layout_constraintBottom_toTopOf="@+id/loopSwitch"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/minTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:gravity="start"
+        android:text="range"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/maxTextView"
+        app:layout_constraintStart_toStartOf="@+id/guideline" />
+
+    <TextView
+        android:id="@+id/maxTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:gravity="start"
+        android:layout_marginTop="8dp"
+        android:textSize="16sp"
+        android:textColor="@color/colorAccent"
+        android:text="Dynamic Range:"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/spectrogramImageView" />
+
+
+</android.support.constraint.ConstraintLayout>
