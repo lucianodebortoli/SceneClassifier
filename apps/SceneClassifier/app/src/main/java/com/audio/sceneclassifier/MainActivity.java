@@ -151,37 +151,45 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         loopSwitch =                findViewById(R.id.loopSwitch);
         compressorSwitch =          findViewById(R.id.compressorSwitch);
         Log.d("console", "UI: Objects Loaded!");
+
         // LANGUAGE SPINNER:
         ArrayAdapter<CharSequence> languageAdapter = ArrayAdapter.createFromResource(
                 this,R.array.language,android.R.layout.simple_spinner_item);
         languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         languageSpinner.setAdapter(languageAdapter);
         languageSpinner.setOnItemSelectedListener(this);
+
         // INTEGRATION SPINNER:
         ArrayAdapter<CharSequence> integrationAdapter = ArrayAdapter.createFromResource(
                 this,R.array.integration,android.R.layout.simple_spinner_item);
         integrationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         integrationSpinner.setAdapter(integrationAdapter);
         integrationSpinner.setOnItemSelectedListener(this);
+
         // COLORMAP SPINNER:
         ArrayAdapter<CharSequence> colorMapAdapter = ArrayAdapter.createFromResource(
                 this,R.array.colorMap,android.R.layout.simple_spinner_item);
         colorMapAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         colorMapSpinner.setAdapter(colorMapAdapter);
         colorMapSpinner.setOnItemSelectedListener(this);
+
         // BUTTONS:
         validateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {validationDataDialog();}});
+
         logButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {logPredictions();}});
+
         runButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {executeTasks();}});
+
         infoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {showInfo();}});
+
         // SWITCH:
         loopSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -199,16 +207,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // SPINNER SELECT LANGUAGE;
         if (itemSelected.equals("ENGLISH")) {currentLanguage = "ENGLISH";}
         if (itemSelected.equals("ESPAÑOL")) {currentLanguage = "ESPAÑOL";}
+
         // SPINNER SELECT INTEGRATION;
         if (itemSelected.equals("INT 5")) {nInteg = 5;}
         if (itemSelected.equals("INT 4")) {nInteg = 4;}
         if (itemSelected.equals("INT 3")) {nInteg = 3;}
         if (itemSelected.equals("INT 2")) {nInteg = 2;}
         if (itemSelected.equals("INT 1")) {nInteg = 1;}
+
         // SPINNER SELECT COLORMAP:
         if (itemSelected.equals("MAGMA")) {currentColorMap = "MAGMA"; }
         if (itemSelected.equals("PLASMA")) {currentColorMap = "PLASMA"; }
         if (itemSelected.equals("VIRIDIS")) {currentColorMap = "VIRIDIS"; }
+
         updateStrings();
         initializePredictions();
         updatePredictions();
@@ -772,10 +783,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         protected float[][] doInBackground(float[][]... specs) {
             publishProgress(0);
             float[][] spec = specs[0];
-            float[][][][] inputTensor = new float[1][melFreqs][frames][1];
-            for (int i = 0; i< frames; i++){
-                for (int j = 0; j< melFreqs; j++) {
-                    inputTensor[0][i][j][0] = spec[i][j];}}
+            float[][][][] inputTensor = new float[1][frames][melFreqs][1];
+            for (int frame = 0; frame< frames; frame++){
+                for (int freq = 0; freq< melFreqs; freq++) {
+                    inputTensor[0][frame][freq][0] = spec[freq][frame];}}
             float[][] outputTensor = new float[1][numClasses];
             try {
                 publishProgress(10);

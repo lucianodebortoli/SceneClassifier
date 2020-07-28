@@ -106,11 +106,15 @@ class MelSpectrogram {
         float[] fftBuffer = new float[fftSize];
         float[][] linSpectrogram = new float[fftFreqs][frames];
         int startSample = 0; // initialize sample counter
-        for (int column=0;column<frames;column++) {
-            for (int i=0; i<fftSize; i++) {fftBuffer[i] = signal[startSample+i] * window[i];}
+        for (int column=0; column<frames; column++) {
+            for (int i=0; i<fftSize; i++) {
+                fftBuffer[i] = signal[startSample+i] * window[i];}
             float[] fftOutput = fft(fftBuffer);  // compute FFT
-            for (int k=0;k<fftFreqs;k++) { linSpectrogram[k][column] = fftOutput[k];	}
-            startSample += hopLength; // increment hop
+            for (int k=0; k<fftFreqs; k++) {
+                linSpectrogram[k][column] = fftOutput[k]; }
+            if (startSample+hopLength+fftSize<signal.length) {
+                startSample += hopLength; // increment hop
+            } else { break; }
         }
         float[][] linearPowerSpectrogram = new float[fftFreqs][frames];
         for (int j=0 ; j < frames ; j++ ) {
