@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SceneClassifier</string>
+    <string name="textRun">INICIAR</string>
+    <string name="textREC">GRABANDO</string>
+    <string name="textProcess">PROCESO</string>
+    <string name="textBuffer">Tamaño Búfer:</string>
+    <string name="textXLabel">Frecuencias Mel / Cuadros de Tiempo</string>
+    <string name="textTitle">Espectrograma</string>
+    <string name="textDataSet">Base de Datos:</string>
+    <string name="textIntegration">Integración:</string>
+    <string name="textLanguage">Idioma:</string>
+    <string name="textColorMap">Mapa de Color:</string>
+    <string name="textInference">PREDECIR</string>
+    <string name="textLoop">CICLO</string>
+    <string name="textSettingsUpdated">Configuración actualizada</string>
+    <string name="textSamples">muestras</string>
+    <string name="textSaved">guardado</string>
+    <string name="textNot_saved">no guardado</string>
+    <string name="textDynamicRange">Rango Dinámico:</string>
+    <string name="textDiversity">Diversidad:</string>
+    <string name="textClasses">clases</string>
+    <string name="textLabels">ETIQUETAS</string>
+</resources>
