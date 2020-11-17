@@ -12,11 +12,11 @@
     </string-array>
 
     <string-array name="integration">
-        <item>INT 5</item>
-        <item>INT 4</item>
-        <item>INT 3</item>
-        <item>INT 2</item>
-        <item>INT 1</item>
+        <item>1000</item>
+        <item>500</item>
+        <item>100</item>
+        <item>50</item>
+        <item>10</item>
     </string-array>
 
     <string-array name="colorMap">

@@ -124,6 +124,7 @@ class MelSpectrogram {
     }
 
     private float[][] melFilterBank(){
+        // TODO: fix scaled spectrogram cropped after (100)
         int fMax = 20000;
         int nFreqs = 1 + fftSize / 2;
         // Fill in the linear scale *(below 1KHz);
@@ -186,7 +187,7 @@ class MelSpectrogram {
     private float[][] flipUD(float[][] spec){
         float[][] spectrogramFlipped = new float[nMels][frames];
         for (int i=0; i< nMels; i++) {
-                System.arraycopy(spec[(nMels-1-i)], 0, spectrogramFlipped[i], 0, frames);
+            System.arraycopy(spec[(nMels-1-i)], 0, spectrogramFlipped[i], 0, frames);
         }
         return spectrogramFlipped;
     }

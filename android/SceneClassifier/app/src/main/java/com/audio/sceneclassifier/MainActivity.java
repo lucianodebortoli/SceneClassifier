@@ -77,16 +77,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public int numClasses;
     public int sizeInFloats;
     public String saveName;
-    //public int targetSamples = (frames+1)*hopLength; // = 132096
-    //public int totalSamples = sampleRate* 4; // record for 4 seconds
-    public int accuracy_0=0, accuracy_1=0, accuracy_2=0;
-    public float[] pred_0, pred_1, pred_2, pred_3, pred_4;
-    //public float[] audioSignal = new float[targetSamples];
     public float[][] spectrogram = new float[MEL_BINS][FRAMES];
     private static final int STORAGE_CODE =     1;
     public static final int RECORD_AUDIO_CODE = 200;
-    //public boolean compressorOn = false;
-    public String dynamicRange, label_0="...", label_1="...", label_2="...";
+    public String dynamicRange;
     public String modelFileName = "CNN.tflite";
     public String currentLanguage = "ENGLISH";
     public String currentColorMap = "MAGMA";
@@ -95,14 +89,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public String directory = Environment.getExternalStorageDirectory()+"/SceneClassifier";
 
 
-    // New var
-    private static int FFT_SIZE = 2048;
-    private static int HOP_SIZE = 1024;
     private static int FRAMES = 128;
     private static int MEL_BINS = 128;
     private int SAMPLE_RATE = 16000;
     private int RECORDING_LENGTH = 132096;
-    private static final String LOG_TAG = "tag_main";
+    private static final String LOG_TAG = "main_activity";
     short[] recRingBuffer = new short[RECORDING_LENGTH];
     int recordingOffset = 0; // used as index for recording audio into circular buffer.
     private final ReentrantLock ringLock = new ReentrantLock(); // lock thread while copying buffer.
@@ -134,7 +125,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     } // startRecording end OK
 
 
-    // stopRecording method is unused, so the recording thread is in an endless loop.
     public synchronized void stopRecording() {
         if (recordingThread == null) {return; }
         recording = false;
@@ -143,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     } // stopRecording end OK
 
 
-    // record method is called only once, its an endless loop.
     private void record() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
 
@@ -182,26 +171,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             isRecording = true;
             int numberRead = record.read(audioBuffer, 0, audioBuffer.length);
             int maxLength = recRingBuffer.length;
-            // writing pointer increment
             int newRecordingOffset = recordingOffset + numberRead;
-            // Samples to copy to the start. Its zero until writing pointer overflows the circular buffer.
             int secondCopyLength = Math.max(0, newRecordingOffset - maxLength);
-            // Samples to copy at writing pointer. its the buffer size until writing pointer overflows.
             int firstCopyLength = numberRead - secondCopyLength;
-            // All data is stored for the recognition thread to access.
-            // ML thread copies from this buffer into its own, while holding the lock, so its thread safe.
             ringLock.lock();
 
             try {
-                // Save read samples from audioBuffer into RingBuffer at index given by writing pointer.
                 System.arraycopy(audioBuffer, 0, recRingBuffer, recordingOffset, firstCopyLength);
-                // If recPointer overflows, copy remaining read samples to the start of the RingBuffer.
                 System.arraycopy(audioBuffer, firstCopyLength, recRingBuffer, 0, secondCopyLength);
-                // Use modulus division for restoring overflown writing pointer
                 recordingOffset = newRecordingOffset % maxLength;
             } finally { ringLock.unlock(); }}
 
-        // only if recording stops:
         isRecording = false;
         Log.d(LOG_TAG,"Recording Stopped");
         record.stop();
@@ -225,13 +205,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         recognizing = false;
         recognitionThread = null;
         Log.d(LOG_TAG, "Stop Recognition");
-    } // stopRecognition OK
+    }
 
 
-    // recognize method is called only once, its an endless loop.
     private void recognize() {
         // Loop, grabbing recorded data and running the recognition model on it.
-
         float[][][][] inputTensor = new float[1][FRAMES][MEL_BINS][1]; // if using spectrogram input
         float[][] outputTensor = new float[1][labels.size()]; // TensorFlow output array
         Log.d(LOG_TAG, "Using " + FRAMES + " time frames and " + MEL_BINS + " frequencies");
@@ -242,51 +220,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             // Copy global parameters to prevent unwanted behaviour while changing models:
             int sampleRate = SAMPLE_RATE;
-            int fftSize = FFT_SIZE;
-            int bins = MEL_BINS;
-            int frames = FRAMES;
 
-            // locking to prevent ring buffer writing while reading into local buffer.
             ringLock.lock();
             try {
                 int maxLength = recRingBuffer.length;
-                // Samples available for reading from writing pointer position to the end of circular buffer.
                 int firstCopyLength = maxLength - recordingOffset;
-                // Samples available for reading from start of circular buffer to writing pointer position.
                 int secondCopyLength = recordingOffset;
-                // Read oldest samples from circular buffer and store them at the start of the inputBuffer.
                 System.arraycopy(recRingBuffer, recordingOffset, inputBuffer16, 0, firstCopyLength);
-                // Read newest samples from overflown circular buffer and fill the inputBuffer.
                 System.arraycopy(recRingBuffer, 0, inputBuffer16, firstCopyLength, secondCopyLength);
             } finally { ringLock.unlock(); }
-
-            // Now inputBuffer holds an array of the last 2 seconds of audio data.
-            // Processes below, within this while loop, should take less than recording buffer length
-            // so that the recording thread does not overwrite unread samples.
-
-            // Convert signed 16-bit inputs into float values [-1.0f, 1.0f].
             float maxRes16 = (float) Math.pow(2, 15) -1;
             for (int i = 0; i < RECORDING_LENGTH; ++i)
                 inputBuffer32[i] = inputBuffer16[i] / maxRes16;
 
-
             spectrogram = new MelSpectrogram(
-                    inputBuffer32, sampleRate, MEL_BINS, frames, fftSize, HOP_SIZE).getSpectrogram();
+                    inputBuffer32, sampleRate, MEL_BINS, FRAMES, 2048, 1024).getSpectrogram();
 
-
-            // Feed Spectrogram to input tensor:
-            for (int frame = 0; frame< frames; frame++){
-                for (int freq = 0; freq< bins; freq++) {
+            for (int frame = 0; frame< FRAMES; frame++){
+                for (int freq = 0; freq< MEL_BINS; freq++) {
                     inputTensor[0][frame][freq][0] = spectrogram[freq][frame];}}
 
-            // Run model inference and update detections:
             tflite.run(inputTensor, outputTensor);
             lastProcessingTimeMs = System.currentTimeMillis() - startTime;
 
             detector.add(outputTensor[0]);
             runOnUiThread(this::updateUI);
 
-        } // while continue recognition (endless loop)
+        }
         isRecognizing = false;
         Log.d(LOG_TAG,"Stopped Recognizing");
     } // recognize end OK
@@ -294,24 +254,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void updateUI(){
         // Fill output tensor
-        float[][] outputTensor = new float[1][labels.size()];
-        for (int i=0; i<labels.size(); i++ )
-            outputTensor[0][i] = detector.smoothDetections[i][0];
-
-        savePredictions(outputTensor);
         updatePredictions();
         showUI();
         showDeveloperUI();
         showSpectrogram();
         sampleRateTV.setText(SAMPLE_RATE+ " Hz");
         inferenceTimeTV.setText(lastProcessingTimeMs + " ms");
-    } // updateUI end
+    }
 
 
     private void initDetector(){
-        SMOOTH_SIZE = 5;
         detector = new Detector(labels, SMOOTH_SIZE);
-    } // initDetector end
+    }
 
 
     private void startBackgroundThread() {
@@ -319,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         backgroundThread.start();
         backgroundHandler = new Handler(backgroundThread.getLooper());
         Log.d(LOG_TAG,"Background thread started");
-    } // startBackgroundThread OK
+    }
 
 
     private void stopBackgroundThread() {
@@ -461,11 +415,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (itemSelected.equals("ESPAÑOL")) {currentLanguage = "ESPAÑOL";}
 
         // SPINNER SELECT INTEGRATION;
-        if (itemSelected.equals("INT 5")) {SMOOTH_SIZE = 5;}
-        if (itemSelected.equals("INT 4")) {SMOOTH_SIZE = 4;}
-        if (itemSelected.equals("INT 3")) {SMOOTH_SIZE = 3;}
-        if (itemSelected.equals("INT 2")) {SMOOTH_SIZE = 2;}
-        if (itemSelected.equals("INT 1")) {SMOOTH_SIZE = 1;}
+        if (itemSelected.equals("1000")) {SMOOTH_SIZE = 1000;}
+        if (itemSelected.equals("500")) {SMOOTH_SIZE = 500;}
+        if (itemSelected.equals("100")) {SMOOTH_SIZE = 100;}
+        if (itemSelected.equals("50")) {SMOOTH_SIZE = 50;}
+        if (itemSelected.equals("10")) {SMOOTH_SIZE = 10;}
+        detector.setBufferSize(labels.size(), SMOOTH_SIZE);
 
         // SPINNER SELECT COLORMAP:
         if (itemSelected.equals("MAGMA")) {currentColorMap = "MAGMA"; }
@@ -473,7 +428,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (itemSelected.equals("VIRIDIS")) {currentColorMap = "VIRIDIS"; }
 
         updateStrings();
-        initializePredictions();
 
         Toast.makeText(this, "Settings Updated", Toast.LENGTH_SHORT).show();
         Log.d(LOG_TAG, "UI: Spinners selected: "+itemSelected);
@@ -565,6 +519,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         runButton.setText(R.string.textRun);
         runButton.setTextColor(getColor(R.color.colorAccent));
         horizontalProgressBar.setProgress(0);
+        bufferEditTextView.setText(sizeInFloats +" "+ getResources().getString(R.string.textSamples));
     } // showUI end
 
 
@@ -574,15 +529,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         compressorSwitch.setVisibility(View.VISIBLE);
         validateButton.setVisibility(View.VISIBLE);
     } // showDeveloperUI end
-
-
-    private void initializePredictions(){
-        if (pred_0 == null || pred_0.length!=numClasses) {pred_0 = new float[numClasses];}
-        if (pred_1 == null || pred_1.length!=numClasses) {pred_1 = new float[numClasses];}
-        if (pred_2 == null || pred_2.length!=numClasses) {pred_2 = new float[numClasses];}
-        if (pred_3 == null || pred_3.length!=numClasses) {pred_3 = new float[numClasses];}
-        if (pred_4 == null || pred_4.length!=numClasses) {pred_4 = new float[numClasses];}
-    }
 
 
     private void initializeLogger(){
@@ -635,7 +581,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
           dynamicRange = (Math.round((specMax-specMin)*80.0*10.0)/10.0)+" dB";
         // apply color map.
         SpectrogramView spectrogramView = new SpectrogramView(
-                getApplicationContext(),spectrogramToPlot,currentColorMap,3,10);
+                getApplicationContext(), spectrogramToPlot, currentColorMap,3,10);
         spectrogramImageView.setImageBitmap(spectrogramView.getBitmap());
         if (currentColorMap.equals("MAGMA")){
             colorBarImageView.setImageResource(R.drawable.magma_cmap);}
@@ -659,56 +605,34 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     } // loadModelFile method end
 
 
-    private void savePredictions(float[][] outputTensorArray){
-        if (pred_0 ==null || pred_0.length!=numClasses || SMOOTH_SIZE <2) {
-            pred_0 = new float[numClasses];}
-        if (pred_1 ==null || pred_1.length!=numClasses || SMOOTH_SIZE <3) {
-            pred_1 = new float[numClasses];}
-        if (pred_2 ==null || pred_2.length!=numClasses || SMOOTH_SIZE <4) {
-            pred_2 = new float[numClasses];}
-        if (pred_3 ==null || pred_3.length!=numClasses || SMOOTH_SIZE <5) {
-            pred_3 = new float[numClasses];}
-        pred_4 = new float[numClasses];
-        pred_4 = pred_3.clone();
-        pred_3 = pred_2.clone();
-        pred_2 = pred_1.clone();
-        pred_1 = pred_0.clone();
-        pred_0 = outputTensorArray[0].clone();
-        Log.d("NNA:", "Predictions Saved");
-    }
-
-
     private void updatePredictions(){
-        float[] meanPredictions = new float[numClasses];
-        for (int i = 0 ; i<numClasses; i++ ){
-            meanPredictions[i] = (pred_0[i]+ pred_1[i]+ pred_2[i]+ pred_3[i]+ pred_4[i])/ SMOOTH_SIZE;}
-        float[] bestPredictions = meanPredictions.clone();
+
+        float[] bestPredictions = new float[numClasses];
+        for (int label = 0;label< numClasses; label++)
+            bestPredictions[label] = detector.smoothDetections[label][0];
         Arrays.sort(bestPredictions); // sort ascending
         int[] topLabelIndexes = new int[3];
-        for (int i=0; i<numClasses;i++){
-            if (meanPredictions[i]==bestPredictions[numClasses-1]){topLabelIndexes[0]= i;}
-            if (meanPredictions[i]==bestPredictions[numClasses-2]){topLabelIndexes[1]= i;}
-            if (meanPredictions[i]==bestPredictions[numClasses-3]){topLabelIndexes[2]= i;}
+        for (int label=0; label<numClasses;label++){
+            if (bestPredictions[numClasses-1]==detector.smoothDetections[label][0])
+                topLabelIndexes[0]= label;
+            if (bestPredictions[numClasses-2]==detector.smoothDetections[label][0])
+                topLabelIndexes[1]= label;
+            if (bestPredictions[numClasses-3]==detector.smoothDetections[label][0])
+                topLabelIndexes[2]= label;
         }
-        label_0 = labelsArray[topLabelIndexes[0]];
-        label_1 = labelsArray[topLabelIndexes[1]];
-        label_2 = labelsArray[topLabelIndexes[2]];
-        accuracy_0 = (int)(bestPredictions[numClasses-1]*100);
-        accuracy_1 = (int)(bestPredictions[numClasses-2]*100);
-        accuracy_2 = (int)(bestPredictions[numClasses-3]*100);
-        // PASS RESULTS TO UI OBJECTS
-        String predictionText_0 = label_0 + " (" + accuracy_0 + "%)";
-        String predictionText_1 = label_1 + " (" + accuracy_1 + "%)";
-        String predictionText_2 = label_2 + " (" + accuracy_2 + "%)";
-        String bufferText      = sizeInFloats +" "+ getResources().getString(R.string.textSamples);
+        int accuracy_0 = (int)(bestPredictions[numClasses-1]*100);
+        int accuracy_1 = (int)(bestPredictions[numClasses-2]*100);
+        int accuracy_2 = (int)(bestPredictions[numClasses-3]*100);
+        String predictionText_0 = labelsArray[topLabelIndexes[0]] + " (" + accuracy_0 + "%)";
+        String predictionText_1 = labelsArray[topLabelIndexes[1]] + " (" + accuracy_1 + "%)";
+        String predictionText_2 = labelsArray[topLabelIndexes[2]] + " (" + accuracy_2 + "%)";
         predictionView_0.setText(predictionText_0);
         predictionView_1.setText(predictionText_1);
         predictionView_2.setText(predictionText_2);
-        bufferEditTextView.setText(bufferText);
         predictionBar1.setProgress(accuracy_0);
         predictionBar2.setProgress(accuracy_1);
         predictionBar3.setProgress(accuracy_2);
-    } //updatePredictions end
+    }
 
 
     private void logPredictions(){
@@ -717,7 +641,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         predictionLogCSV.append(getCurrentTime());
         for (int i = 0; i< numClasses; i++){
             predictionLogCSV.append(",");
-            predictionLogCSV.append(pred_0[i]);}
+            predictionLogCSV.append(detector.detections[i][0]);}
         saveCSV(predictionLogCSV,"Logs.csv");
         logButton.setEnabled(false);
         logButton.setTextColor(getColor(R.color.colorGray));
@@ -862,7 +786,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             predictionsDataCSV.append(",");
             predictionsDataCSV.append(labelsArray[i]);
             predictionsDataCSV.append(",");
-            predictionsDataCSV.append(pred_0[i]);}
+            predictionsDataCSV.append(detector.detections[i][0]);}
         // SAVE CSV FILES:
         saveCSV(signalDataCSV,getCurrentTime()+saveName+"_signal.csv");
         saveCSV(spectrogramDataCSV,getCurrentTime()+saveName+"_spectrogram.csv");

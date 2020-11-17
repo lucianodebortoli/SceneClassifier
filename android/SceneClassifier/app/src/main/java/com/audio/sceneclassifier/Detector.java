@@ -19,12 +19,6 @@ public class Detector {
         Log.d("detector","labelSize "+ labelSize);
     } // Detector constructor end
 
-    Detector(String[] labels, int memorySize){
-        setBufferSize(labels.length, memorySize);
-        Log.d("detector","labelSize "+ labelSize);
-    } // Detector constructor end
-
-
     public synchronized float meanSmoothing(int label) {
         float sum = 0;
         for (int frame=0; frame<memorySize; frame++)
@@ -58,8 +52,8 @@ public class Detector {
     } // add end
 
 
-    public synchronized void setBufferSize(int labelsLength, int memoryLength){
-        labelSize = labelsLength;
+    public synchronized void setBufferSize(int num_labels, int memoryLength){
+        labelSize = num_labels;
         memorySize = memoryLength;
         this.detections = new float[labelSize][memorySize];
         this.smoothDetections = new float[labelSize][memorySize];
