@@ -47,15 +47,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
-
+import org.json.simple.JSONArray;
+import org.json.JSONException;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.tensorflow.lite.Interpreter;
 import static java.util.Locale.*;
 
@@ -74,10 +80,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Switch loopSwitch, compressorSwitch;
 
     // INITIALIZE VARIABLES:
-    public int numClasses;
-    public int sizeInFloats;
-    public String saveName;
-    public float[][] spectrogram = new float[MEL_BINS][FRAMES];
+
+    private int SAMPLE_RATE = 16000;
+    private int RECORDING_LENGTH = 132096;
     private static final int STORAGE_CODE =     1;
     public static final int RECORD_AUDIO_CODE = 200;
     public String dynamicRange;
@@ -87,12 +92,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public List<String> labels;
     String[] labelsArray;
     public String directory = Environment.getExternalStorageDirectory()+"/SceneClassifier";
+    public int numClasses;
+    public int sizeInFloats;
+    public String saveName;
 
-
+    public int FFT_SIZE = 2048;
     private static int FRAMES = 128;
     private static int MEL_BINS = 128;
-    private int SAMPLE_RATE = 16000;
-    private int RECORDING_LENGTH = 132096;
+    public float[][] spectrogram = new float[MEL_BINS][FRAMES];
+    public float[][] melBasis = new float[MEL_BINS][1+FFT_SIZE/2];
     private static final String LOG_TAG = "main_activity";
     short[] recRingBuffer = new short[RECORDING_LENGTH];
     int recordingOffset = 0; // used as index for recording audio into circular buffer.
@@ -234,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 inputBuffer32[i] = inputBuffer16[i] / maxRes16;
 
             spectrogram = new MelSpectrogram(
-                    inputBuffer32, sampleRate, MEL_BINS, FRAMES, 2048, 1024).getSpectrogram();
+                    inputBuffer32, sampleRate, MEL_BINS, FRAMES, 2048, 1024, melBasis).getSpectrogram();
 
             for (int frame = 0; frame< FRAMES; frame++){
                 for (int freq = 0; freq< MEL_BINS; freq++) {
@@ -267,6 +275,35 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         detector = new Detector(labels, SMOOTH_SIZE);
     }
 
+    public String loadJSONFromAsset(String fileName) {
+        String json = null;
+        try {
+            InputStream is = getAssets().open(fileName);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, StandardCharsets.UTF_8);
+        } catch (IOException ex) { ex.printStackTrace(); return null; }
+        return json;
+    } // loadJSONFromAsset end
+
+
+    private void initMels(){
+        // Only load mel weights array if feature method is HTK.
+        try {
+            //String filePath = "file:///android_asset/" + MEL_BASIS_NAME;
+            Object parser = new JSONParser().parse(loadJSONFromAsset("weights_librosa.json"));
+            JSONObject json = (JSONObject) parser;
+            JSONArray melsArray = (JSONArray) json.get("melWeights");
+            assert melsArray != null;
+            for (int i = 0; i < melsArray.size(); i++) {
+                JSONArray binsArray = (JSONArray) melsArray.get(i);
+                for (int j = 0; j < binsArray.size(); j++) {
+                    //Log.d("basis", "position i "+ i + "| j: " +j );
+                    melBasis[i][j] =  (float) ((double) binsArray.get(j));}}
+        } catch (ParseException e) {e.printStackTrace(); }
+    } // initMelWeights end
 
     private void startBackgroundThread() {
         backgroundThread = new HandlerThread(HANDLE_THREAD_NAME);
@@ -315,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         updateStrings();
         resetUI();
         init_model();
+        initMels();
         initializeLogger();
         initDetector();
         startRecognition();

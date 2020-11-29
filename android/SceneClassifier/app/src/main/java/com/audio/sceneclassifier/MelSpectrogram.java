@@ -10,15 +10,14 @@ class MelSpectrogram {
     private int hopLength;
     private float[][] melSpectrogram;
 
-    MelSpectrogram(float[] signal, int sampleRate, int nMels, int frames, int fftSize, int hopLength){
+    MelSpectrogram(float[] signal, int sampleRate, int nMels, int frames, int fftSize, int hopLength, float[][] melBasis){
         this.sampleRate = sampleRate;
         this.nMels = nMels;
         this.frames = frames;
         this.fftSize = fftSize;
         this.hopLength=hopLength;
         float[][] linSpec = linearSpectrogram(signal);
-        float[][] melFilters = melFilterBank();
-        float[][] filteredSpectrogram = dot(melFilters, linSpec);
+        float[][] filteredSpectrogram = dot(melBasis, linSpec);
         float[][] melSpectrogram_dB = power_to_db(filteredSpectrogram);
         float[][] melSpectrogram_dB_flip = flipUD(melSpectrogram_dB);
         melSpectrogram = normalize(melSpectrogram_dB_flip);
