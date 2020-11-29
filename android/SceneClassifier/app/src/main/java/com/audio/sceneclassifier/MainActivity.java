@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     // INITIALIZE VARIABLES:
 
-    private int SAMPLE_RATE = 16000;
+    private int SAMPLE_RATE = 48000;
     private int RECORDING_LENGTH = 132096;
     private static final int STORAGE_CODE =     1;
     public static final int RECORD_AUDIO_CODE = 200;
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String[] labelsArray;
     public String directory = Environment.getExternalStorageDirectory()+"/SceneClassifier";
     public int numClasses;
-    public int sizeInFloats;
+    public int finalSize;
     public String saveName;
 
     public int FFT_SIZE = 2048;
@@ -155,7 +155,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             minBufferSize = SAMPLE_RATE * 2; }
         Log.v(LOG_TAG, "Min buffer length: " + minBufferSize);
 
-        short[] audioBuffer = new short[minBufferSize / 2];
+        finalSize = minBufferSize / 2 ;
+
+        short[] audioBuffer = new short[finalSize];
         Log.v(LOG_TAG, "Audio buffer length: " + audioBuffer.length);
 
         AudioRecord record =
@@ -241,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             for (int i = 0; i < RECORDING_LENGTH; ++i)
                 inputBuffer32[i] = inputBuffer16[i] / maxRes16;
 
-            inputBuffer32[2000] = 2.0f; // generate artifact for normalization reference.
+            inputBuffer32[2048] = 2.0f; // generate artifact for normalization reference.
 
             spectrogram = new MelSpectrogram(
                     inputBuffer32, sampleRate, MEL_BINS, FRAMES, 2048, 1024, melBasis).getSpectrogram();
@@ -559,7 +561,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         runButton.setText(R.string.textRun);
         runButton.setTextColor(getColor(R.color.colorAccent));
         horizontalProgressBar.setProgress(0);
-        bufferEditTextView.setText(sizeInFloats +" "+ getResources().getString(R.string.textSamples));
+        bufferEditTextView.setText(finalSize +" "+ getResources().getString(R.string.textSamples));
     } // showUI end
 
 
