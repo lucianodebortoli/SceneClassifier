@@ -241,6 +241,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             for (int i = 0; i < RECORDING_LENGTH; ++i)
                 inputBuffer32[i] = inputBuffer16[i] / maxRes16;
 
+            inputBuffer32[2000] = 2.0f; // generate artifact for normalization reference.
+
             spectrogram = new MelSpectrogram(
                     inputBuffer32, sampleRate, MEL_BINS, FRAMES, 2048, 1024, melBasis).getSpectrogram();
 
